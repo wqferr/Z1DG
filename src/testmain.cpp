@@ -11,7 +11,7 @@
 int main(void) {
     using pairii = std::pair<int, int>;
     using alloc_type = z1dg::FreeListAllocator<pairii>;
-    auto alloc = alloc_type();
+    alloc_type alloc;
     using alloc_traits = std::allocator_traits<alloc_type>;
     const int N = 30;
     pairii *pairs[N];

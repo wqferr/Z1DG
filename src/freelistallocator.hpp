@@ -11,10 +11,10 @@ namespace z1dg {
     class FreeListAllocator {
         public:
             using value_type = T;
-            using size_type = std::size_t;
+            using size_type = ::std::size_t;
             using pointer = T *;
             using const_pointer = const T *;
-            using difference_type = typename std::pointer_traits<pointer>::difference_type;
+            using difference_type = typename ::std::pointer_traits<pointer>::difference_type;
 
             template<typename U>
             struct rebind {
@@ -39,14 +39,16 @@ namespace z1dg {
                     return this->n < other.n;
                 }
             };
-            std::vector<Block> pool;
+            ::std::vector<Block> pool;
             size_type max_pool_size;
             mutex_type pool_mutex;
     };
 
     template<typename T>
     FreeListAllocator<T>::FreeListAllocator(FreeListAllocator<T>::size_type max_pool_size) noexcept
-            : max_pool_size(max_pool_size) {}
+            : max_pool_size(max_pool_size) {
+        create_mutex(this->pool_mutex);
+    }
 
     template<typename T>
     FreeListAllocator<T>::~FreeListAllocator(void) noexcept {
@@ -69,6 +71,7 @@ namespace z1dg {
                     );
                     this->pool.emplace_back(ptr, size);
                 }
+                return 0;
             }
         );
     }
@@ -77,15 +80,13 @@ namespace z1dg {
     typename FreeListAllocator<T>::pointer FreeListAllocator<T>::allocate(FreeListAllocator<T>::size_type n) noexcept {
         if (this->pool.size() > 0) {
             Block b(nullptr, n);
-            auto first_geq = std::lower_bound(this->pool.begin(), this->pool.end(), b);
+            auto first_geq = ::std::lower_bound(this->pool.begin(), this->pool.end(), b);
             if (first_geq != this->pool.end()) {
                 auto addr = first_geq->address;
                 this->pool.erase(first_geq);
-                std::cout << "reutilizing" << std::endl;
                 return addr;
             }
         }
-        std::cout << "allocating new block" << std::endl;
         return static_cast<pointer>(malloc(n * sizeof(value_type)));
     }
 
@@ -98,8 +99,9 @@ namespace z1dg {
         Block b(p, n);
         {
             lock_mutex(this->pool_mutex, [&](void *) {
-                auto first_geq = std::lower_bound(this->pool.begin(), this->pool.end(), b);
+                auto first_geq = ::std::lower_bound(this->pool.begin(), this->pool.end(), b);
                 this->pool.insert(first_geq, b);
+                return 0;
             });
         }
     }

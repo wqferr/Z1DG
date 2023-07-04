@@ -18,6 +18,14 @@ namespace z1dg {
         #endif
     }
 
+    void create_mutex(mutex_type &m) {
+        #ifdef OS_Windows
+            m = CreateMutex(NULL, FALSE, NULL);
+        #else
+            //nop
+        #endif
+    }
+
     bool lock_mutex(mutex_type &mutex, threading_func_type f, void *arg) {
         #ifdef OS_Windows
             if (WaitForSingleObject(mutex, INFINITE) == WAIT_OBJECT_0) {
