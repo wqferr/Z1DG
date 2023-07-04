@@ -1,4 +1,3 @@
-from cpython.mem cimport PyMem_Malloc, PyMem_Free
 cimport cython
 
 cdef class KeyItem:
