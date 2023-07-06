@@ -35,11 +35,11 @@ namespace z1dg {
     private:
         struct  FreeHeader{};
         using Node = StackLinkedList<FreeHeader>::Node;
-        StackLinkedList<FreeHeader> m_freeList;
+        StackLinkedList<FreeHeader> freeList;
 
-        void * m_start_ptr = nullptr;
-        std::size_t m_totalSize;
-        std::size_t m_chunkSize;
+        void * startPtr = nullptr;
+        std::size_t nChunks;
+        std::size_t chunkSize;
     public:
         PoolAllocator(std::size_t nChunks, std::size_t chunkSize);
         ~PoolAllocator();

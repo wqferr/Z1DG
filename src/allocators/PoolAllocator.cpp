@@ -33,40 +33,39 @@ SOFTWARE.
 namespace z1dg {
     PoolAllocator::PoolAllocator(std::size_t nChunks, std::size_t chunkSize) {
         assert(chunkSize >= sizeof(Node) && format("Chunk size must be greater or equal to {}", sizeof(Node)).c_str());
-        this->m_totalSize = nChunks * chunkSize;
-        this->m_chunkSize = chunkSize;
+        this->nChunks = nChunks;
+        this->chunkSize = chunkSize;
     }
 
     void PoolAllocator::Init() {
-        m_start_ptr = malloc(m_totalSize);
+        startPtr = malloc(this->nChunks * this->chunkSize);
         this->Reset();
     }
 
     PoolAllocator::~PoolAllocator() {
-        free(m_start_ptr);
+        free(startPtr);
     }
 
     void *PoolAllocator::Allocate() {
-        Node * freePosition = this->m_freeList.pop();
+        Node * freePosition = this->freeList.pop();
         assert(freePosition != nullptr && "The pool allocator is full");
 
         return static_cast<void *>(freePosition);
     }
 
     std::size_t PoolAllocator::GetChunkSize(void) {
-        return this->m_chunkSize;
+        return this->chunkSize;
     }
 
     void PoolAllocator::Free(void * ptr) {
-        this->m_freeList.push((Node *) ptr);
+        this->freeList.push((Node *) ptr);
     }
 
     void PoolAllocator::Reset() {
         // Create a linked-list with all free positions
-        const int nChunks = this->m_totalSize / this->m_chunkSize;
-        for (int i = 0; i < nChunks; ++i) {
-            std::size_t address = (std::size_t) this->m_start_ptr + i * this->m_chunkSize;
-            this->m_freeList.push((Node *) address);
+        for (int i = 0; i < this->nChunks; ++i) {
+            std::size_t address = (std::size_t) this->startPtr + i * this->chunkSize;
+            this->freeList.push((Node *) address);
         }
     }
 }
