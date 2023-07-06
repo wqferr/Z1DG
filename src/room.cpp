@@ -12,6 +12,18 @@ namespace z1dg {
         this->is_root = false;
     }
 
+    void Room::set_allocator(z1dg::Allocator *new_allocator) {
+        Room::allocator = new_allocator;
+    }
+
+    Room *Room::allocate(void) {
+        if (Room::allocator == nullptr) {
+            return (Room *) malloc(sizeof(Room));
+        } else {
+            return (Room *) Room::allocator->Allocate(sizeof(Room));
+        }
+    }
+
     Room *Room::make_root(
             int x,
             int y,
@@ -20,7 +32,8 @@ namespace z1dg {
             int max_depth,
             int n_tunnels,
             int n_item_rooms) noexcept {
-        Room *root = new Room(x, y, 0);
+        Room *root = allocate();
+        new (root) Room(x, y, 0); // run constructor, but dont allocate memory
         root->is_root = true;
         return root;
     }
@@ -38,7 +51,8 @@ namespace z1dg {
         }
 
         auto dir_offset = direction_offsets[direction];
-        Room *new_node = new Room(
+        Room *new_node = allocate();
+        new (new_node) Room( // call constructor on already allocated memory
             this->x + dir_offset.first,
             this->y + dir_offset.second,
             this->depth + 1

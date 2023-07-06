@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <cstddef> // size_t
 
-namespace z1dg::allocators {
+namespace z1dg {
     class Allocator {
     protected:
         std::size_t m_totalSize;

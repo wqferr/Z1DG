@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef C8F4E798_AEAC_47C5_90DA_1D7B512F23BE
 #define C8F4E798_AEAC_47C5_90DA_1D7B512F23BE
 
-namespace z1dg::allocators {
+namespace z1dg {
     template <class T>
     class StackLinkedList {
     public:

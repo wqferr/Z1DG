@@ -30,7 +30,7 @@ SOFTWARE.
 
 #include "threading.hpp"
 
-namespace z1dg::allocators {
+namespace z1dg {
     class PoolAllocator : public Allocator {
     private:
         struct  FreeHeader{
