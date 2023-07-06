@@ -1,6 +1,6 @@
 #include "threading.hpp"
 
-namespace z1dg::threading {
+namespace z1dg {
     thread_type spawn_thread(threading_func_type f, void *arg) {
         #ifdef OS_Windows
             DWORD thread_id;

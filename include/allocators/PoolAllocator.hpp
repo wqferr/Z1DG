@@ -25,34 +25,34 @@ SOFTWARE.
 #ifndef C221C765_31D4_4E4C_A004_CD0263C93E94
 #define C221C765_31D4_4E4C_A004_CD0263C93E94
 
-#include "allocators/Allocator.hpp"
 #include "allocators/StackLinkedList.hpp"
 
 #include "threading.hpp"
 
+// NOT thread safe
 namespace z1dg {
-    class PoolAllocator : public Allocator {
+    class PoolAllocator {
     private:
-        struct  FreeHeader{
-        };
+        struct  FreeHeader{};
         using Node = StackLinkedList<FreeHeader>::Node;
         StackLinkedList<FreeHeader> m_freeList;
 
         void * m_start_ptr = nullptr;
+        std::size_t m_totalSize;
         std::size_t m_chunkSize;
-        z1dg::threading::mutex_type m_mutex;
     public:
-        PoolAllocator(const std::size_t totalSize, const std::size_t chunkSize);
+        PoolAllocator(std::size_t nChunks, std::size_t chunkSize);
+        ~PoolAllocator();
 
-        virtual ~PoolAllocator();
+        std::size_t GetChunkSize();
 
-        virtual void* Allocate(const std::size_t size, const std::size_t alignment = 0) override;
+        void* Allocate();
 
-        virtual void Free(void* ptr) override;
+        void Free(void* ptr);
 
-        virtual void Init() override;
+        void Init();
 
-        virtual void Reset();
+        void Reset();
     private:
         PoolAllocator(PoolAllocator &poolAllocator);
 

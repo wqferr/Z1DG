@@ -15,7 +15,7 @@ def main():
                 Extension(
                     "z1dg",
                     sources=["src/z1dg.pyx"],
-                    include_dirs=["include"],
+                    include_dirs=["src", "include"],
                     language="c++"
                 )
             ]

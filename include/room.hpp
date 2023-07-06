@@ -2,7 +2,7 @@
 #include "item.hpp"
 #include "except.hpp"
 
-#include "allocators/Allocator.hpp"
+#include "allocators/PoolAllocator.hpp"
 
 #include <tuple>
 
@@ -21,7 +21,7 @@ namespace z1dg {
             bool is_root;
             int depth;
 
-            static z1dg::Allocator *allocator;
+            static PoolAllocator *allocator;
 
             static int get_next_id() {
                 static int next_id = 0;
@@ -31,7 +31,7 @@ namespace z1dg {
             static Room *allocate();
             Room(int x, int y, int depth);
         public:
-            static void set_allocator(z1dg::Allocator *new_allocator);
+            static bool set_allocator(PoolAllocator *new_allocator);
 
             static Room *make_root(
                     int x,

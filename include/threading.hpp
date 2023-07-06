@@ -5,14 +5,13 @@
 #include <functional>
 
 #ifdef OS_Windows
-#define NOMINMAX
 #include <windows.h>
 #else
 #include <thread>
 #include <mutex>
 #endif
 
-namespace z1dg::threading {
+namespace z1dg {
 #ifdef OS_Windows
     typedef HANDLE mutex_type;
     typedef HANDLE thread_type;

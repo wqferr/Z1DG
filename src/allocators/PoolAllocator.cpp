@@ -23,22 +23,18 @@ SOFTWARE.
 */
 
 #include "allocators/PoolAllocator.hpp"
+#include "format.hpp"
 
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>     /* malloc, free */
 #include <algorithm>    //max
-#ifdef _DEBUG
-#include <iostream>
-#endif
 
-namespace z1dg::allocators {
-    PoolAllocator::PoolAllocator(const std::size_t totalSize, const std::size_t chunkSize)
-    : Allocator(totalSize) {
-        assert(chunkSize >= 8 && "Chunk size must be greater or equal to 8");
-        assert(totalSize % chunkSize == 0 && "Total Size must be a multiple of Chunk Size");
+namespace z1dg {
+    PoolAllocator::PoolAllocator(std::size_t nChunks, std::size_t chunkSize) {
+        assert(chunkSize >= sizeof(Node) && format("Chunk size must be greater or equal to {}", sizeof(Node)).c_str());
+        this->m_totalSize = nChunks * chunkSize;
         this->m_chunkSize = chunkSize;
-        z1dg::threading::create_mutex(&this->m_mutex);
     }
 
     void PoolAllocator::Init() {
@@ -50,74 +46,27 @@ namespace z1dg::allocators {
         free(m_start_ptr);
     }
 
-    struct poolallocator_allocate_threadsafe {
-        PoolAllocator *alloc;
-        void *free_position;
-    };
+    void *PoolAllocator::Allocate() {
+        Node * freePosition = this->m_freeList.pop();
+        assert(freePosition != nullptr && "The pool allocator is full");
 
-    void *PoolAllocator::Allocate(const std::size_t allocationSize, const std::size_t alignment) {
-        assert(allocationSize == this->m_chunkSize && "Allocation size must be equal to chunk size");
-
-        poolallocator_allocate_threadsafe arg { this, nullptr };
-        z1dg::threading::lock_mutex(
-            this->m_mutex,
-            [](void *aptr) -> z1dg::threading::thread_return_status {
-                poolallocator_allocate_threadsafe *a = static_cast<poolallocator_allocate_threadsafe *>(aptr);
-                Node * freePosition = a->alloc->m_freeList.pop();
-
-                assert(freePosition != nullptr && "The pool allocator is full");
-
-                a->alloc->m_used += a->alloc->m_chunkSize;
-                a->alloc->m_peak = std::max(a->alloc->m_peak, a->alloc->m_used);
-                a->free_position = static_cast<void *>(freePosition);
-            }
-        );
-#ifdef _DEBUG
-        std::cout << "A" << "\t@S " << m_start_ptr << "\t@R " << (void*) arg.free_position << "\tM " << m_used << std::endl;
-#endif
-
-        return arg.free_position;
+        return static_cast<void *>(freePosition);
     }
 
-    struct poolallocator_free_threadsafe {
-        PoolAllocator *alloc;
-        void *freed_ptr;
-    };
+    std::size_t PoolAllocator::GetChunkSize(void) {
+        return this->m_chunkSize;
+    }
 
     void PoolAllocator::Free(void * ptr) {
-        poolallocator_free_threadsafe arg { this, ptr };
-        z1dg::threading::lock_mutex(
-            this->m_mutex,
-            [](void *aptr) -> z1dg::threading::thread_return_status {
-                poolallocator_free_threadsafe *a = static_cast<poolallocator_free_threadsafe *>(aptr);
-                a->alloc->m_used -= a->alloc->m_chunkSize;
-                a->alloc->m_freeList.push((Node *) a->freed_ptr);
-            },
-            &arg
-        );
-
-#ifdef _DEBUG
-        std::cout << "F" << "\t@S " << m_start_ptr << "\t@F " << ptr << "\tM " << m_used << std::endl;
-#endif
+        this->m_freeList.push((Node *) ptr);
     }
 
     void PoolAllocator::Reset() {
-        z1dg::threading::lock_mutex(
-            m_mutex,
-            [](void *ptr) -> z1dg::threading::thread_return_status {
-                PoolAllocator *alloc = static_cast<PoolAllocator *>(ptr);
-                alloc->m_used = 0;
-                alloc->m_peak = 0;
-
-                // Create a linked-list with all free positions
-                const int nChunks = alloc->m_totalSize / alloc->m_chunkSize;
-                for (int i = 0; i < nChunks; ++i) {
-                    std::size_t address = (std::size_t) alloc->m_start_ptr + i * alloc->m_chunkSize;
-                    alloc->m_freeList.push((Node *) address);
-                }
-                return 0;
-            },
-            this
-        );
+        // Create a linked-list with all free positions
+        const int nChunks = this->m_totalSize / this->m_chunkSize;
+        for (int i = 0; i < nChunks; ++i) {
+            std::size_t address = (std::size_t) this->m_start_ptr + i * this->m_chunkSize;
+            this->m_freeList.push((Node *) address);
+        }
     }
 }

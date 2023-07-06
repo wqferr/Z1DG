@@ -12,15 +12,19 @@ namespace z1dg {
         this->is_root = false;
     }
 
-    void Room::set_allocator(z1dg::Allocator *new_allocator) {
+    bool Room::set_allocator(z1dg::PoolAllocator *new_allocator) {
+        if (new_allocator->GetChunkSize() != sizeof(Room)) {
+            return false;
+        }
         Room::allocator = new_allocator;
+        return true;
     }
 
     Room *Room::allocate(void) {
         if (Room::allocator == nullptr) {
             return (Room *) malloc(sizeof(Room));
         } else {
-            return (Room *) Room::allocator->Allocate(sizeof(Room));
+            return (Room *) Room::allocator->Allocate();
         }
     }
 
