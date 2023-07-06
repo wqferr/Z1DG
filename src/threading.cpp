@@ -1,10 +1,10 @@
 #include "threading.hpp"
 
-namespace z1dg {
+namespace z1dg::threading {
     thread_type spawn_thread(threading_func_type f, void *arg) {
         #ifdef OS_Windows
             DWORD thread_id;
-            return CreateThread(NULL, 0, f, arg, 0, &thread_id);
+            return CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)f, arg, 0, &thread_id);
         #else
             return std::thread(f, arg);
         #endif
@@ -18,11 +18,11 @@ namespace z1dg {
         #endif
     }
 
-    void create_mutex(mutex_type &m) {
+    void create_mutex(mutex_type *m) {
         #ifdef OS_Windows
-            m = CreateMutex(NULL, FALSE, NULL);
+            *m = CreateMutex(NULL, FALSE, NULL);
         #else
-            //nop
+            // nop
         #endif
     }
 

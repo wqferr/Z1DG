@@ -28,6 +28,8 @@ SOFTWARE.
 #include "allocators/Allocator.hpp"
 #include "allocators/StackLinkedList.hpp"
 
+#include "threading.hpp"
+
 namespace z1dg::allocators {
     class PoolAllocator : public Allocator {
     private:
@@ -38,6 +40,7 @@ namespace z1dg::allocators {
 
         void * m_start_ptr = nullptr;
         std::size_t m_chunkSize;
+        z1dg::threading::mutex_type m_mutex;
     public:
         PoolAllocator(const std::size_t totalSize, const std::size_t chunkSize);
 

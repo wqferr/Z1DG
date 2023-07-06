@@ -47,7 +47,7 @@ namespace z1dg {
     template<typename T>
     FreeListAllocator<T>::FreeListAllocator(FreeListAllocator<T>::size_type max_pool_size) noexcept
             : max_pool_size(max_pool_size) {
-        create_mutex(this->pool_mutex);
+        create_mutex(&this->pool_mutex);
     }
 
     template<typename T>
