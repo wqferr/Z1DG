@@ -17,9 +17,9 @@ namespace z1dg {
     typedef HANDLE thread_type;
     typedef LPTHREAD_START_ROUTINE threading_func_type;
 #else
-    typedef ::std::mutex mutex_type;
-    typedef ::std::thread thread_type;
-    typedef ::std::function<int(void *)> threading_func_type;
+    typedef std::mutex mutex_type;
+    typedef std::thread thread_type;
+    typedef std::function<int(void *)> threading_func_type;
 #endif
 
     thread_type spawn_thread(z1dg::threading_func_type f, void *arg=nullptr);

@@ -1,16 +1,15 @@
+# cython: language_level=3
 from distutils.core import setup
 from Cython.Build import cythonize
 import os
 
 def main():
-    compile_flags = [] if os.name == "nt" else ["-pthread"]
+    flags = [] if os.name == "nt" else ["-pthread"]
+    flags += "-I./include"
+    os.environ["CFLAGS"] = " ".join(flags)
     setup(
         name = "Z1DG",
-        ext_modules = cythonize(
-            "src/z1dg.pyx",
-            compiler_directives={"languge_level": "3"},
-            extra_compile_args=compile_flags
-        )
+        ext_modules = cythonize("src/z1dg.pyx")
     )
 
 if __name__ == "__main__":
