@@ -1,6 +1,10 @@
 #ifndef A1D038E5_45DE_4CB8_9B65_A0A57477F6C1
 #define A1D038E5_45DE_4CB8_9B65_A0A57477F6C1
 
+namespace z1dg {
+    class Room;
+}
+
 #include "direction.hpp"
 #include "item.hpp"
 #include "except.hpp"

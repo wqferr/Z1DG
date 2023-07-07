@@ -16,7 +16,7 @@ def main():
                     "z1dg",
                     [
                         "src/z1dg.pyx",
-                        "src/allocators/PoolAllocator.cpp",
+                        "src/allocators/PoolAllocator_c.cpp",
                         "src/direction.pyx"
                     ],
                     include_dirs=["src", "include"],
