@@ -6,7 +6,7 @@ import os
 
 def main():
     flags = [] if os.name == "nt" else ["-pthread"]
-    flags += "-I./include"
+    flags += ["-I./include"]
     os.environ["CFLAGS"] = " ".join(flags)
     setup(
         name = "Z1DG",
@@ -14,12 +14,17 @@ def main():
             [
                 Extension(
                     "z1dg",
-                    sources=["src/z1dg.pyx"],
+                    [
+                        "src/z1dg.pyx",
+                        # "src/room.cpp",
+                        "src/allocators/PoolAllocator.cpp"
+                    ],
                     include_dirs=["src", "include"],
                     language="c++"
-                )
-            ]
-        )
+                ),
+            ],
+            compiler_directives = {"language_level": "3"}
+        ),
     )
 
 if __name__ == "__main__":

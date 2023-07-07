@@ -1,31 +1,21 @@
 #include "room.hpp"
 #include "except.hpp"
-#include "format.hpp"
 
 #include <string>
 
 namespace z1dg {
+
+    thread_local PoolAllocator room_allocator(N_ROOMS_ALLOCATOR, sizeof(Room));
+
+    Room *allocate(void) {
+        return (Room *) room_allocator.Allocate();
+    }
+
     Room::Room(int x, int y, int depth): x(x), y(y), depth(depth) {
         this->id = get_next_id();
         this->basement = nullptr;
         this->lock = NO_ITEM;
         this->is_root = false;
-    }
-
-    bool Room::set_allocator(z1dg::PoolAllocator *new_allocator) {
-        if (new_allocator->GetChunkSize() != sizeof(Room)) {
-            return false;
-        }
-        Room::allocator = new_allocator;
-        return true;
-    }
-
-    Room *Room::allocate(void) {
-        if (Room::allocator == nullptr) {
-            return (Room *) malloc(sizeof(Room));
-        } else {
-            return (Room *) Room::allocator->Allocate();
-        }
     }
 
     Room *Room::make_root(
@@ -44,14 +34,14 @@ namespace z1dg {
 
     Room *Room::make_child(Direction direction) {
         if (!this->has_room_for_child(direction)) {
-            throw DungeonGenException(
-                format(
-                    "Space to the {} of ({}, {}) is already occupied",
-                    direction_names[direction],
-                    this->x,
-                    this->y
-                ).c_str()
-            );
+            std::string msg = "Space to the ";
+            msg += direction_names[direction];
+            msg += " of (";
+            msg += this->x;
+            msg += ", ";
+            msg += this->y;
+            msg += ") is already occupied";
+            throw DungeonGenException(msg.c_str());
         }
 
         auto dir_offset = direction_offsets[direction];

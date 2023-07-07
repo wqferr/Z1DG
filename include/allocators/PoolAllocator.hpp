@@ -33,7 +33,7 @@ SOFTWARE.
 namespace z1dg {
     class PoolAllocator {
     private:
-        struct  FreeHeader{};
+        struct FreeHeader {};
         using Node = StackLinkedList<FreeHeader>::Node;
         StackLinkedList<FreeHeader> freeList;
 

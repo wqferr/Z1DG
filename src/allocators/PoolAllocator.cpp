@@ -23,16 +23,18 @@ SOFTWARE.
 */
 
 #include "allocators/PoolAllocator.hpp"
-#include "format.hpp"
 
 #include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>     /* malloc, free */
 #include <algorithm>    //max
+#include <sstream>
 
 namespace z1dg {
     PoolAllocator::PoolAllocator(std::size_t nChunks, std::size_t chunkSize) {
-        assert(chunkSize >= sizeof(Node) && format("Chunk size must be greater or equal to {}", sizeof(Node)).c_str());
+        std::stringstream ss("Chunk size must be greater than or equal to ");
+        ss << sizeof(Node);
+        assert(chunkSize >= sizeof(Node) && ss);
         this->nChunks = nChunks;
         this->chunkSize = chunkSize;
     }
@@ -63,8 +65,8 @@ namespace z1dg {
 
     void PoolAllocator::Reset() {
         // Create a linked-list with all free positions
-        for (int i = 0; i < this->nChunks; ++i) {
-            std::size_t address = (std::size_t) this->startPtr + i * this->chunkSize;
+        for (std::size_t i = 0; i < this->nChunks; ++i) {
+            void *address = (int8_t *) this->startPtr + i * this->chunkSize;
             this->freeList.push((Node *) address);
         }
     }
