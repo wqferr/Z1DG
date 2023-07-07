@@ -35,14 +35,7 @@ namespace z1dg {
         public:
             static bool set_allocator(PoolAllocator *new_allocator);
 
-            static Room *make_root(
-                    int x,
-                    int y,
-                    float prob_children=1.0f,
-                    float prob_single_child=0.3f,
-                    int max_depth=9,
-                    int n_tunnels=1,
-                    int n_item_rooms=1) noexcept;
+            static Room *make_root(int x, int y) noexcept;
 
             Room *make_child(Direction direction);
             Room *get_parent();

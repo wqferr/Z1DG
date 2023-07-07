@@ -18,14 +18,7 @@ namespace z1dg {
         this->is_root = false;
     }
 
-    Room *Room::make_root(
-            int x,
-            int y,
-            float prob_children,
-            float prob_single_child,
-            int max_depth,
-            int n_tunnels,
-            int n_item_rooms) noexcept {
+    Room *Room::make_root(int x, int y) noexcept {
         Room *root = allocate();
         new (root) Room(x, y, 0); // run constructor, but dont allocate memory
         root->is_root = true;
