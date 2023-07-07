@@ -1241,12 +1241,13 @@ static PyObject *__pyx_pf_4z1dg_test(CYTHON_UNUSED PyObject *__pyx_self); /* pro
  * 
  * cpdef test():             # <<<<<<<<<<<<<<
  *     cdef RoomGrid *grid = new RoomGrid(10, 10, True)
- *     # cdef Room *r = Room.make_root(grid, 0, 0)
+ *     cdef Room *root = Room.make_root(grid, 3, 5)
  */
 
 static PyObject *__pyx_pw_4z1dg_1test(PyObject *__pyx_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static PyObject *__pyx_f_4z1dg_test(CYTHON_UNUSED int __pyx_skip_dispatch) {
-  CYTHON_UNUSED z1dg::RoomGrid *__pyx_v_grid;
+  z1dg::RoomGrid *__pyx_v_grid;
+  z1dg::Room *__pyx_v_root;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("test", 0);
@@ -1255,17 +1256,35 @@ static PyObject *__pyx_f_4z1dg_test(CYTHON_UNUSED int __pyx_skip_dispatch) {
  * 
  * cpdef test():
  *     cdef RoomGrid *grid = new RoomGrid(10, 10, True)             # <<<<<<<<<<<<<<
+ *     cdef Room *root = Room.make_root(grid, 3, 5)
+ *     del root
+ */
+  __pyx_v_grid = new z1dg::RoomGrid(10, 10, 1);
+
+  /* "z1dg.pyx":7
+ * cpdef test():
+ *     cdef RoomGrid *grid = new RoomGrid(10, 10, True)
+ *     cdef Room *root = Room.make_root(grid, 3, 5)             # <<<<<<<<<<<<<<
+ *     del root
+ *     # cdef Room *r = Room.make_root(grid, 0, 0)
+ */
+  __pyx_v_root = z1dg::Room::make_root(__pyx_v_grid, 3, 5);
+
+  /* "z1dg.pyx":8
+ *     cdef RoomGrid *grid = new RoomGrid(10, 10, True)
+ *     cdef Room *root = Room.make_root(grid, 3, 5)
+ *     del root             # <<<<<<<<<<<<<<
  *     # cdef Room *r = Room.make_root(grid, 0, 0)
  *     # cdef Room *child = r.make_child(Direction.NORTH)
  */
-  __pyx_v_grid = new z1dg::RoomGrid(10, 10, 1);
+  delete __pyx_v_root;
 
   /* "z1dg.pyx":5
  * from roomgrid cimport RoomGrid
  * 
  * cpdef test():             # <<<<<<<<<<<<<<
  *     cdef RoomGrid *grid = new RoomGrid(10, 10, True)
- *     # cdef Room *r = Room.make_root(grid, 0, 0)
+ *     cdef Room *root = Room.make_root(grid, 3, 5)
  */
 
   /* function exit code */

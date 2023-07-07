@@ -14,6 +14,7 @@ namespace z1dg {
     public:
         RoomGrid(std::size_t rows, std::size_t cols, bool delete_children_on_death) noexcept;
         ~RoomGrid() noexcept;
+
         bool is_within_bounds(std::size_t row, std::size_t col) noexcept;
         bool has_room(std::size_t row, std::size_t col) noexcept;
         void add_room(std::size_t row, std::size_t col, Room *room);

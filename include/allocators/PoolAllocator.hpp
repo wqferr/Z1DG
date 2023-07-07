@@ -45,13 +45,8 @@ namespace z1dg {
         ~PoolAllocator();
 
         std::size_t GetChunkSize();
-
         void* Allocate();
-
         void Free(void* ptr);
-
-        void Init();
-
         void Reset();
     private:
         PoolAllocator(PoolAllocator &poolAllocator);

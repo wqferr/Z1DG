@@ -37,9 +37,6 @@ namespace z1dg {
         assert(chunkSize >= sizeof(Node) && ss);
         this->nChunks = nChunks;
         this->chunkSize = chunkSize;
-    }
-
-    void PoolAllocator::Init() {
         startPtr = malloc(this->nChunks * this->chunkSize);
         this->Reset();
     }
