@@ -2,10 +2,13 @@
 
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
 
 namespace z1dg {
     RoomGrid::RoomGrid(std::size_t rows, std::size_t cols, bool delete_rooms_on_death) noexcept {
         this->elements = static_cast<Room **>(malloc(rows * cols * sizeof(*this->elements)));
+        this->n_rows = rows;
+        this->n_cols = cols;
         std::size_t total_rooms = rows * cols;
         for (std::size_t i = 0; i < total_rooms; i++) {
             this->elements[i] = nullptr;
@@ -14,10 +17,13 @@ namespace z1dg {
     }
 
     RoomGrid::~RoomGrid() noexcept {
+        std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
         if (this->delete_rooms_on_death) {
             std::size_t total_rooms = this->n_rows * this->n_cols;
+            std::cout << "deleting! (" << total_rooms << ")" << std::endl;
             for (std::size_t i = 0; i < total_rooms; i++) {
                 if (this->elements[i] != nullptr) {
+                    std::cout << "found one!" << std::endl;
                     delete this->elements[i];
                 }
             }

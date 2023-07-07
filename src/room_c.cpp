@@ -8,7 +8,6 @@
 #include <iostream>
 
 namespace z1dg {
-
     thread_local PoolAllocator room_allocator(N_ROOMS_ALLOCATOR, sizeof(Room));
 
     Room *allocate_room(void) {
@@ -16,7 +15,7 @@ namespace z1dg {
     }
     void *Room::operator new(std::size_t nbytes) {
         (void) nbytes;
-        std::cout << "allocated! " << nbytes << " vs " << sizeof(Room) << std::endl;
+        std::cout << "allocated!" << std::endl;
         return room_allocator.Allocate();
     }
 
@@ -25,11 +24,13 @@ namespace z1dg {
         room_allocator.Free(ptr);
     }
 
-    Room::Room(RoomGrid *grid, int x, int y, int depth): grid(grid), x(x), y(y), depth(depth) {
+    Room::Room(RoomGrid *grid, int row, int col, int depth): grid(grid), row(row), col(col), depth(depth) {
         this->id = get_next_id();
         this->parent = nullptr;
         this->basement = nullptr;
         this->lock = NO_ITEM;
+
+        grid->add_room(row, col, this);
     }
 
     bool Room::is_root() noexcept {
@@ -40,12 +41,12 @@ namespace z1dg {
         return this->id;
     }
 
-    int Room::get_x() noexcept {
-        return this->x;
+    std::size_t Room::get_row() noexcept {
+        return this->row;
     }
 
-    int Room::get_y() noexcept {
-        return this->y;
+    std::size_t Room::get_col() noexcept {
+        return this->col;
     }
 
     Room *Room::make_root(RoomGrid *grid, int x, int y) noexcept {
@@ -59,9 +60,9 @@ namespace z1dg {
             std::string msg = "Space to the ";
             msg += direction_names[direction];
             msg += " of (";
-            msg += this->x;
+            msg += this->row;
             msg += ", ";
-            msg += this->y;
+            msg += this->col;
             msg += ") is already occupied";
             throw DungeonGenException(msg.c_str());
         }
@@ -71,8 +72,8 @@ namespace z1dg {
         // new (new_node) Room( // call constructor on already allocated memory
         Room *new_node = new Room(
             this->grid,
-            this->x + dir_offset.first,
-            this->y + dir_offset.second,
+            this->row + dir_offset.first,
+            this->col + dir_offset.second,
             this->depth + 1
         );
         new_node->parent = this;
@@ -88,15 +89,15 @@ namespace z1dg {
     Room *Room::get_neighbor(Direction direction) noexcept {
         auto offset = direction_offsets[direction];
         return this->grid->get_room(
-            this->x + std::get<0>(offset),
-            this->y + std::get<1>(offset)
+            this->row + std::get<0>(offset),
+            this->col + std::get<1>(offset)
         );
     }
 
     std::tuple<int, int> Room::get_offset_from(Room *other) noexcept {
         return std::forward_as_tuple(
-            this->x - other->x,
-            this->y - other->y
+            this->row - other->row,
+            this->col - other->col
         );
     }
 

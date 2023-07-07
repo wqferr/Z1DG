@@ -30,8 +30,7 @@ namespace z1dg {
             Basement *basement;
             itemid lock;
             roomid id;
-            int x, y;
-            // bool is_root; check for depth == 0 instead
+            std::size_t row, col;
             int depth;
 
             static int get_next_id() {
@@ -47,8 +46,8 @@ namespace z1dg {
 
             bool is_root() noexcept;
             roomid get_id() noexcept;
-            int get_x() noexcept;
-            int get_y() noexcept;
+            std::size_t get_row() noexcept;
+            std::size_t get_col() noexcept;
 
             Room *get_parent() noexcept;
             Room *get_neighbor(Direction direction) noexcept;

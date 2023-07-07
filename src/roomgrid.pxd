@@ -5,7 +5,7 @@ cdef extern from "roomgrid_c.cpp":
 
 cdef extern from "roomgrid.hpp" namespace "z1dg":
     cdef cppclass RoomGrid "z1dg::RoomGrid":
-        RoomGrid(int n_rows, int n_cols, bint manage_room_deletion)
+        RoomGrid(int n_rows, int n_cols, bint manage_room_deletion) except +
 
         bint is_within_bounds(int row, int col)
         bint has_room(int row, int col)
