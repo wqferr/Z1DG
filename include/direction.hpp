@@ -4,14 +4,13 @@
 #include <utility>
 
 namespace z1dg {
-    enum Direction {
-        NORTH,
-        EAST,
-        SOUTH,
-        WEST,
+    typedef int Direction;
+    const Direction NORTH = 0;
+    const Direction EAST = 1;
+    const Direction SOUTH = 2;
+    const Direction WEST = 3;
 
-        N_DIRECTIONS
-    };
+    const Direction N_DIRECTIONS = 4;
 
     const Direction inverse_directions[] = {
         SOUTH,

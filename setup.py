@@ -16,8 +16,8 @@ def main():
                     "z1dg",
                     [
                         "src/z1dg.pyx",
-                        # "src/room.cpp",
-                        "src/allocators/PoolAllocator.cpp"
+                        "src/allocators/PoolAllocator.cpp",
+                        "src/direction.pyx"
                     ],
                     include_dirs=["src", "include"],
                     language="c++"
