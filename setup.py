@@ -6,7 +6,7 @@ import os
 
 def main():
     flags = [] if os.name == "nt" else ["-pthread"]
-    flags += ["-I./include"]
+    flags += ["-I./include", "-D_DEBUG"]
     os.environ["CFLAGS"] = " ".join(flags)
     setup(
         name = "Z1DG",
@@ -17,7 +17,7 @@ def main():
                     [
                         "src/z1dg.pyx",
                         "src/allocators/PoolAllocator_c.cpp",
-                        "src/direction.pyx"
+                        # "src/direction.pyx"
                     ],
                     include_dirs=["src", "include"],
                     language="c++"

@@ -12,18 +12,19 @@ namespace z1dg {
 namespace z1dg {
     class RoomGrid {
     public:
-        RoomGrid(std::size_t rows, std::size_t cols, bool delete_children_on_death) noexcept;
+        RoomGrid(std::size_t rows, std::size_t cols, bool manage_room_destruction) noexcept;
         ~RoomGrid() noexcept;
 
         bool is_within_bounds(std::size_t row, std::size_t col) noexcept;
         bool has_room(std::size_t row, std::size_t col) noexcept;
         void add_room(std::size_t row, std::size_t col, Room *room);
         Room *get_room(std::size_t row, std::size_t col);
-        bool remove_room(std::size_t row, std::size_t col);
+        // this doesnt make sense with the parent hierarchy set up in Room
+        // bool remove_room(std::size_t row, std::size_t col);
     private:
         Room **elements;
         std::size_t n_rows, n_cols;
-        bool delete_rooms_on_death;
+        bool manage_room_destruction;
 
         void check_oob(std::size_t row, std::size_t col);
     };

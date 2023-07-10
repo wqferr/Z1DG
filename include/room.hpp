@@ -12,11 +12,12 @@ namespace z1dg {
 #include "allocators/PoolAllocator.hpp"
 
 #include "roomgrid.hpp"
+#include "allocators/PoolAllocator.hpp"
 
 #include <tuple>
 #include <list>
 
-#define N_ROOMS_ALLOCATOR (70)
+#define N_ROOMS_ALLOCATOR (200)
 
 namespace z1dg {
     typedef unsigned int roomid;
@@ -24,28 +25,32 @@ namespace z1dg {
     class Basement;
     class Room {
         private:
+            PoolAllocator *allocator;
             RoomGrid *grid;
             Room *parent;
             std::list<Room *> children;
             Basement *basement;
             itemid lock;
-            roomid id;
+            roomid id, root_id;
             std::size_t row, col;
-            int depth;
+            std::size_t depth;
 
             static int get_next_id() {
                 thread_local static int next_id = 1;
                 return next_id++;
             }
 
-            Room(RoomGrid *grid, int x, int y, int depth);
+            Room(RoomGrid *grid, std::size_t row, std::size_t col, std::size_t depth);
         public:
-            static Room *make_root(RoomGrid *grid, int x, int y) noexcept;
+            static Room *make_root(RoomGrid *grid, std::size_t row, std::size_t col) noexcept;
             Room *make_child_adjacent(Direction direction);
-            // TODO make_child_tunnel
+            Room *make_child_tunnel(std::size_t row, std::size_t col);
+
+            void add_item_basement(itemid item);
 
             bool is_root() noexcept;
             roomid get_id() noexcept;
+            roomid get_root_id() noexcept;
             std::size_t get_row() noexcept;
             std::size_t get_col() noexcept;
 
@@ -63,7 +68,12 @@ namespace z1dg {
             void operator delete(void *ptr);
         };
 
-    class Basement {};
+    class Basement {
+    private:
+        Room *parent;
+        Room *child;
+        itemid item;
+    };
 }
 
 

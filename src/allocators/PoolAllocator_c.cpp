@@ -34,7 +34,7 @@ namespace z1dg {
     PoolAllocator::PoolAllocator(std::size_t nChunks, std::size_t chunkSize) {
         std::stringstream ss("Chunk size must be greater than or equal to ");
         ss << sizeof(Node);
-        assert(chunkSize >= sizeof(Node) && ss);
+        assert(chunkSize >= sizeof(Node) && ss.str().c_str());
         this->nChunks = nChunks;
         this->chunkSize = chunkSize;
         startPtr = malloc(this->nChunks * this->chunkSize);

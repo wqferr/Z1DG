@@ -2,10 +2,9 @@
 
 #include <stdexcept>
 #include <sstream>
-#include <iostream>
 
 namespace z1dg {
-    RoomGrid::RoomGrid(std::size_t rows, std::size_t cols, bool delete_rooms_on_death) noexcept {
+    RoomGrid::RoomGrid(std::size_t rows, std::size_t cols, bool manage_room_destruction) noexcept {
         this->elements = static_cast<Room **>(malloc(rows * cols * sizeof(*this->elements)));
         this->n_rows = rows;
         this->n_cols = cols;
@@ -13,17 +12,14 @@ namespace z1dg {
         for (std::size_t i = 0; i < total_rooms; i++) {
             this->elements[i] = nullptr;
         }
-        this->delete_rooms_on_death = delete_rooms_on_death;
+        this->manage_room_destruction = manage_room_destruction;
     }
 
     RoomGrid::~RoomGrid() noexcept {
-        std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-        if (this->delete_rooms_on_death) {
+        if (this->manage_room_destruction) {
             std::size_t total_rooms = this->n_rows * this->n_cols;
-            std::cout << "deleting! (" << total_rooms << ")" << std::endl;
             for (std::size_t i = 0; i < total_rooms; i++) {
                 if (this->elements[i] != nullptr) {
-                    std::cout << "found one!" << std::endl;
                     delete this->elements[i];
                 }
             }
@@ -58,13 +54,14 @@ namespace z1dg {
         this->elements[index] = room;
     }
 
-    bool RoomGrid::remove_room(std::size_t row, std::size_t col) {
-        this->check_oob(row, col);
-        auto index = row * this->n_cols + col;
-        bool success = this->elements[index] != nullptr;
-        this->elements[index] = nullptr;
-        return success;
-    }
+    // see roomgrid.hpp
+    // bool RoomGrid::remove_room(std::size_t row, std::size_t col) {
+    //     this->check_oob(row, col);
+    //     auto index = row * this->n_cols + col;
+    //     bool success = this->elements[index] != nullptr;
+    //     this->elements[index] = nullptr;
+    //     return success;
+    // }
 
     Room *RoomGrid::get_room(std::size_t row, std::size_t col) {
         this->check_oob(row, col);

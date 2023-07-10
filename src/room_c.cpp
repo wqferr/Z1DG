@@ -4,8 +4,11 @@
 
 #include <string>
 #include <tuple>
+#include <sstream>
 
+#ifdef _DEBUG
 #include <iostream>
+#endif
 
 namespace z1dg {
     thread_local PoolAllocator room_allocator(N_ROOMS_ALLOCATOR, sizeof(Room));
@@ -13,18 +16,29 @@ namespace z1dg {
     Room *allocate_room(void) {
         return (Room *) room_allocator.Allocate();
     }
+
     void *Room::operator new(std::size_t nbytes) {
         (void) nbytes;
+#ifdef _DEBUG
         std::cout << "allocated!" << std::endl;
-        return room_allocator.Allocate();
+#endif
+        Room *new_room = static_cast<Room *>(room_allocator.Allocate());
+        new_room->allocator = &room_allocator;
+        return new_room;
     }
 
     void Room::operator delete(void *ptr) {
-        std::cout << "deallocated!";
-        room_allocator.Free(ptr);
+#ifdef _DEBUG
+        std::cout << "deallocated!" << std::endl;
+#endif
+
+        static_cast<Room *>(ptr)->allocator->Free(ptr);
     }
 
-    Room::Room(RoomGrid *grid, int row, int col, int depth): grid(grid), row(row), col(col), depth(depth) {
+    Room::Room(RoomGrid *grid, std::size_t row, std::size_t col, std::size_t depth): grid(grid), row(row), col(col), depth(depth) {
+#ifdef _DEBUG
+        std::cout << "constructor!" << std::endl;
+#endif
         this->id = get_next_id();
         this->parent = nullptr;
         this->basement = nullptr;
@@ -41,6 +55,10 @@ namespace z1dg {
         return this->id;
     }
 
+    roomid Room::get_root_id() noexcept {
+        return this->root_id;
+    }
+
     std::size_t Room::get_row() noexcept {
         return this->row;
     }
@@ -49,27 +67,22 @@ namespace z1dg {
         return this->col;
     }
 
-    Room *Room::make_root(RoomGrid *grid, int x, int y) noexcept {
-        // Room *root = allocate_room();
-        // new (root) Room(grid, x, y, 0); // run constructor, but dont allocate memory
-        return new Room(grid, x, y, 0);
+    Room *Room::make_root(RoomGrid *grid, std::size_t x, std::size_t y) noexcept {
+        Room *root = new Room(grid, x, y, 0);
+        root->root_id = root->id;
+        return root;
     }
 
     Room *Room::make_child_adjacent(Direction direction) {
         if (!this->has_room_for_child(direction)) {
-            std::string msg = "Space to the ";
-            msg += direction_names[direction];
-            msg += " of (";
-            msg += this->row;
-            msg += ", ";
-            msg += this->col;
-            msg += ") is already occupied";
-            throw DungeonGenException(msg.c_str());
+            std::stringstream ss("Space to the ");
+            ss << direction_names[direction] << "of (";
+            ss << static_cast<int>(this->row) << ", " << static_cast<int>(this->col);
+            ss << ") is already occupied";
+            throw DungeonGenException(ss.str().c_str());
         }
 
         auto dir_offset = direction_offsets[direction];
-        // Room *new_node = allocate_room();
-        // new (new_node) Room( // call constructor on already allocated memory
         Room *new_node = new Room(
             this->grid,
             this->row + dir_offset.first,
@@ -77,6 +90,7 @@ namespace z1dg {
             this->depth + 1
         );
         new_node->parent = this;
+        new_node->root_id = this->root_id;
         //this->children[direction] = new_node;
 
         return new_node;
